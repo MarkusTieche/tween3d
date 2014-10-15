@@ -1,0 +1,68 @@
+<!doctype html>
+<html style='height:100%;'>
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <script src="//cdn.jsdelivr.net/babylonjs/1.12/babylon.min.js"></script>
+    <script src="tween.min.js"></script>
+</head>
+<body style='margin: 0px; overflow: hidden; height:100%; text-align:center;'>
+    <canvas id="canvas" style="width:100%; height:100%; left:0px; position:absolute;"></canvas>
+    <script>
+    
+    //DETECT WEBGL
+    if (!document.getElementById("canvas").getContext('webgl')) 
+    {
+            // the browser doesn't even know what WebGL is
+            var div = document.createElement("div");
+            var txt = document.createElement("h2");
+                txt.innerHTML = "WEBGL is not supportet!!";
+                txt.style.position = "absolute";
+                txt.style.marginTop = "20%";
+                txt.style.width = "100%";
+
+            var img = document.createElement("img");
+            img.src = "../tween3d_alt.png";
+            img.style.width = "100%"
+
+            var src = document.getElementById("header");
+            div.appendChild(txt);
+            div.appendChild(img);
+            document.body.appendChild(div);
+    } 
+    else 
+    {
+    
+            //ADD SCENE 
+            var canvas = document.getElementById("canvas");
+            var engine = new BABYLON.Engine(canvas, true);
+            var scene = new BABYLON.Scene(engine);
+            var cube = BABYLON.Mesh.CreateBox("Box", 1, scene,true);
+            var light = new BABYLON.PointLight("light01", new BABYLON.Vector3(1, 3, 4), scene);
+            var camera = new BABYLON.FreeCamera("camera01", new BABYLON.Vector3(1, 1, 4), scene);
+            var materialSphere1 = new BABYLON.StandardMaterial("texture1", scene);
+                materialSphere1.wireframe = false;
+                cube.material = materialSphere1;
+
+
+            camera.setTarget(new BABYLON.Vector3(1, 0, 0));
+
+            //ADD TWEEN 
+        var tween = new TWEEN.Tween(cube.position).to({ x: 2, y: 0, z: 0 }, 1000).start();
+            tween.easing(TWEEN.Easing.Elastic.InOut);
+            tween.repeat(Infinity); 
+            tween.yoyo(true);
+
+            //ADD EVENTS TO TWEEN
+            tween.onStart(function() { console.log("start") });
+            tween.onComplete(function() { console.log("complete") });
+
+            // Render
+            engine.runRenderLoop(function() {
+                scene.render();
+                TWEEN.update();
+        });
+    
+    }
+</script></body>
+</html>

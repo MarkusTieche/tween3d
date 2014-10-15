@@ -1,0 +1,114 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/three.js/r68/three.min.js"></script>
+    <script src="tween.min.js"></script>
+</head>
+<body style='margin: 0px; overflow: hidden; text-align:center;'>
+    <canvas id="canvas"></canvas>
+    <script>
+    
+	//////////////////////////////////////////////////////////////////////////////////
+	//		Init
+	//////////////////////////////////////////////////////////////////////////////////
+
+        
+    //CHECK FORST IF WEBGL IS AVAILABLE    
+    if (!document.getElementById("canvas").getContext('webgl')) 
+    {
+        // the browser doesn't even know what WebGL is
+        var div = document.createElement("div");
+        var txt = document.createElement("h2");
+            txt.innerHTML = "WEBGL is not supportet!!";
+            txt.style.position = "absolute";
+            txt.style.marginTop = "20%";
+            txt.style.width = "100%";
+            
+        var img = document.createElement("img");
+        img.src = "../tween3d_alt.png";
+        img.style.width = "100%"
+
+        var src = document.getElementById("header");
+        div.appendChild(txt);
+        div.appendChild(img);
+        document.body.appendChild(div);
+    } 
+    else 
+    {
+
+        // init renderer
+        var renderer	= new THREE.WebGLRenderer({
+            antialias	: true,canvas: document.getElementById("canvas")
+        });
+        renderer.setClearColor(new THREE.Color('lightgrey'), 1)
+        renderer.setSize( window.innerWidth, window.innerHeight );
+
+        // array of functions for the rendering loop
+        var onRenderFcts= [];
+
+        // init scene and camera
+        var scene	= new THREE.Scene();
+        var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 1000);
+        camera.position.z = 2;
+        camera.position.x = 0.5;
+        camera.position.y = 0.4;
+
+        //////////////////////////////////////////////////////////////////////////////////
+        //		add an object in the scene
+        //////////////////////////////////////////////////////////////////////////////////
+
+        // add a box	
+        var geometry	= new THREE.BoxGeometry(0.5,0.5,0.5);
+        var material	= new THREE.MeshNormalMaterial(); 
+        var mesh	= new THREE.Mesh( geometry, material );
+        scene.add( mesh );
+
+        // add Tween
+        var tween = new TWEEN.Tween(mesh.position).to({ x: 1, y: 0, z: 0 }, 1000).start();
+            tween.easing(TWEEN.Easing.Elastic.InOut);
+            tween.repeat(Infinity); 
+            tween.yoyo(true);
+
+        //ADD EVENTS TO TWEEN
+            tween.onStart(function() { console.log("start") });
+            tween.onComplete(function() { console.log("complete") });
+
+        //////////////////////////////////////////////////////////////////////////////////
+        //		render the whole thing on the page
+        //////////////////////////////////////////////////////////////////////////////////
+
+        // handle window resize
+        window.addEventListener('resize', function(){
+            renderer.setSize( window.innerWidth, window.innerHeight )
+            camera.aspect	= window.innerWidth / window.innerHeight
+            camera.updateProjectionMatrix()		
+        }, false)
+
+        // render the scene
+        onRenderFcts.push(function(){
+            renderer.render( scene, camera );		
+        })
+
+        // run the rendering loop
+        var lastTimeMsec= null
+        requestAnimationFrame(function animate(nowMsec){
+            // keep looping
+            requestAnimationFrame( animate );
+            // measure time
+            lastTimeMsec	= lastTimeMsec || nowMsec-1000/60
+            var deltaMsec	= Math.min(200, nowMsec - lastTimeMsec)
+            lastTimeMsec	= nowMsec
+            // call each update function
+            onRenderFcts.forEach(function(onRenderFct){
+                onRenderFct(deltaMsec/1000, nowMsec/1000)
+
+            //UPDATE TWEEN
+            TWEEN.update();
+
+            })
+        })
+  };    
+</script></body>
+</html>
