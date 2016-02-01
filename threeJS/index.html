@@ -7,6 +7,7 @@
     <script src="tween.min.js"></script>
 </head>
 <body style='margin: 0px; overflow: hidden; text-align:center;'>
+	<canvas id="canvas"></canvas>
     <script>
     
 	//////////////////////////////////////////////////////////////////////////////////
@@ -38,11 +39,11 @@
     {
 
         // init renderer
-         var renderer = new THREE.WebGLRenderer({antialias:true});
+        var renderer	= new THREE.WebGLRenderer({
+            antialias	: true,canvas: document.getElementById("canvas")
+        });
         renderer.setClearColor(new THREE.Color('lightgrey'), 1)
-        renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT); // SET RENDER SIZE
-        document.body.appendChild( renderer.domElement ); // APPEND RENDER CANVAS TO BODY
-        renderer.domElement.id = "canvas_threeJS"; // SET CANVAS ID
+        renderer.setSize( window.innerWidth, window.innerHeight );
 
         // array of functions for the rendering loop
         var onRenderFcts= [];
